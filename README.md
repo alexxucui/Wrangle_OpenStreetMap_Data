@@ -1,13 +1,242 @@
-# Wrangle_OpenStreetMap_Data
+# Wrangle OpenStreetMap Data - New York
 
-
-Project Overview
+## Project Overview
 You will choose any area of the world in https://www.openstreetmap.org and use data munging techniques, such as assessing the quality of the data for validity, accuracy, completeness, consistency and uniformity, to clean the OpenStreetMap data for a part of the world that you care about. Finally, you will choose either MongoDB or SQL as the data schema to complete your project.
 
-What will I learn?
+## What will I learn?
+
 After completing the project, you will be able to:
 
-Assess the quality of the data for validity, accuracy, completeness, consistency and uniformity.
-Parsing and gather data from popular file formats such as .json, .xml, .csv, .html
-Process data from many files and very large files that can be cleaned with spreadsheet programs
-Learn how to store, query, and aggregate data using MongoDB or SQL
+- Assess the quality of the data for validity, accuracy, completeness, consistency and uniformity.
+- Parsing and gather data from popular file formats such as .json, .xml, .csv, .html
+- Process data from many files and very large files that can be cleaned with spreadsheet programs.
+- Learn how to store, query, and aggregate data using MongoDB or SQL.
+
+## Map Area
+
+New York City, NY, Unisted States
+
+I am living in New York now. As the largest city in the world, I’m interested to see how does the database look like, and I’d like an opportunity to contribute to its improvement this map.
+
+![New York OpenStree Map]()
+
+Dateset: [XML Data Source](https://mapzen.com/data/metro-extracts/metro/new-york_new-york/)
+
+## Overview of the Data
+
+We first use the `getsample.py` to only extract 1/10 data from the whole data set. The sample dataset is stroed in `newyork_sample.osm` and is about 270 MB.
+
+### Data File Size
+
+```
+new-york_new-york.osm ... 2.6 GB
+newyork_sample.osm ...... 260 MB
+nodes.csv ............... 144 MB
+nodes_tags.csv .......... 0.64 MB
+ways.csv ................ 4.7 MB
+ways_tags.csv ........... 20 MB
+ways_nodes.cv ........... 35 MB  
+```
+
+### Tag Nmae
+
+```
+'member': 14703,
+'nd': 1450874,
+'node': 1144670,
+'osm': 1,
+'relation': 909,
+'tag': 967033,
+'way': 179340}
+```
+
+### Check Tag Key Type
+
+We first check the "k" value for each tag and see if there are any potential problems. I proposed 3 regular expressions to check for certain patterns in the "k" value.
+
+- "lower", for tags that contain only lowercase letters and are valid
+- "lower_colon", for otherwise valid tags with a colon in their names
+- "problemchars", for tags with problematic characters
+- "other", for other tags that do not fall into the other three categorie
+
+```
+'lower': 375253, 
+'lower_colon': 578910
+'other': 10370
+'problemchars': 2500
+```
+
+## Unique Users
+
+`len(users): 2428`
+
+## Problems encountered in the Map Data
+
+After runing some code(in the jupyter notebook file) on the `newyork_sample.osm` dataset, I noticed five main problems with the data:
+
+- Different styles of steet names
+- Different styles of postal codes
+
+### Street Names
+```
+- Abbreviation *(Ave., Ave, St., St, Blvd, Pkwt)
+- Capital      *(AVenue, avenue, CIRCLE)*
+- Wrong spell  *(Avene)*
+- Wrong fields *(New York)* 
+
+```
+
+
+
+### Postal Codes
+
+10001-11102
+
+## Generate the CSV Database
+
+If the element top level tag is "node":
+The dictionary returned should have the format {"node": .., "node_tags": ...}
+
+The "node" field should hold a dictionary of the following top level node attributes:
+- id
+- user
+- uid
+- version
+- lat
+- lon
+- timestamp
+- changeset
+All other attributes can be ignored
+
+The "node_tags" field should hold a list of dictionaries, one per secondary tag. Secondary tags are
+child tags of node which have the tag name/type: "tag". Each dictionary should have the following
+fields from the secondary tag attributes:
+- id: the top level node id attribute value
+- key: the full tag "k" attribute value if no colon is present or the characters after the colon if one is.
+- value: the tag "v" attribute value
+- type: either the characters before the colon in the tag "k" value or "regular" if a colon
+        is not present.
+
+Additionally,
+
+- if the tag "k" value contains problematic characters, the tag should be ignored
+- if the tag "k" value contains a ":" the characters before the ":" should be set as the tag type
+  and characters after the ":" should be set as the tag key
+- if there are additional ":" in the "k" value they and they should be ignored and kept as part of
+  the tag key. For example:
+
+  <tag k="addr:street:name" v="Lincoln"/>
+  should be turned into
+  {'id': 12345, 'key': 'street:name', 'value': 'Lincoln', 'type': 'addr'}
+
+- If a node has no secondary tags then the "node_tags" field should just contain an empty list.
+
+The final return value for a "node" element should look something like:
+
+{'node': {'id': 757860928,
+          'user': 'uboot',
+          'uid': 26299,
+       'version': '2',
+          'lat': 41.9747374,
+          'lon': -87.6920102,
+          'timestamp': '2010-07-22T16:16:51Z',
+      'changeset': 5288876},
+ 'node_tags': [{'id': 757860928,
+                'key': 'amenity',
+                'value': 'fast_food',
+                'type': 'regular'},
+               {'id': 757860928,
+                'key': 'cuisine',
+                'value': 'sausage',
+                'type': 'regular'},
+               {'id': 757860928,
+                'key': 'name',
+                'value': "Shelly's Tasty Freeze",
+                'type': 'regular'}]}
+
+If the element top level tag is "way":
+The dictionary should have the format {"way": ..., "way_tags": ..., "way_nodes": ...}
+
+The "way" field should hold a dictionary of the following top level way attributes:
+- id
+-  user
+- uid
+- version
+- timestamp
+- changeset
+
+All other attributes can be ignored
+
+The "way_tags" field should again hold a list of dictionaries, following the exact same rules as
+for "node_tags".
+
+Additionally, the dictionary should have a field "way_nodes". "way_nodes" should hold a list of
+dictionaries, one for each nd child tag.  Each dictionary should have the fields:
+- id: the top level element (way) id
+- node_id: the ref attribute value of the nd tag
+- position: the index starting at 0 of the nd tag i.e. what order the nd tag appears within
+            the way element
+
+The final return value for a "way" element should look something like:
+
+{'way': {'id': 209809850,
+         'user': 'chicago-buildings',
+         'uid': 674454,
+         'version': '1',
+         'timestamp': '2013-03-13T15:58:04Z',
+         'changeset': 15353317},
+ 'way_nodes': [{'id': 209809850, 'node_id': 2199822281, 'position': 0},
+               {'id': 209809850, 'node_id': 2199822390, 'position': 1},
+               {'id': 209809850, 'node_id': 2199822392, 'position': 2},
+               {'id': 209809850, 'node_id': 2199822369, 'position': 3},
+               {'id': 209809850, 'node_id': 2199822370, 'position': 4},
+               {'id': 209809850, 'node_id': 2199822284, 'position': 5},
+               {'id': 209809850, 'node_id': 2199822281, 'position': 6}],
+ 'way_tags': [{'id': 209809850,
+               'key': 'housenumber',
+               'type': 'addr',
+               'value': '1412'},
+              {'id': 209809850,
+               'key': 'street',
+               'type': 'addr',
+               'value': 'West Lexington St.'},
+              {'id': 209809850,
+               'key': 'street:name',
+               'type': 'addr',
+               'value': 'Lexington'},
+              {'id': '209809850',
+               'key': 'street:prefix',
+               'type': 'addr',
+               'value': 'West'},
+              {'id': 209809850,
+               'key': 'street:type',
+               'type': 'addr',
+               'value': 'Street'},
+              {'id': 209809850,
+               'key': 'building',
+               'type': 'regular',
+               'value': 'yes'},
+              {'id': 209809850,
+               'key': 'levels',
+               'type': 'building',
+               'value': '1'},
+              {'id': 209809850,
+               'key': 'building_id',
+               'type': 'chicago',
+               'value': '366409'}]}
+
+
+
+
+
+## SQL
+
+
+
+## Other ideas about the dataset
+
+
+## Conclusions
+
+
+
