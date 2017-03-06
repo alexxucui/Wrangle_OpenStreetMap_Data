@@ -278,7 +278,6 @@ sqlite> CREATE TABLE nodes(schema)
 sqlite> .mode csv
 sqlite> .import nodes.csv nodes
 ...
-
 ```
 
 ## SQL
@@ -376,7 +375,6 @@ bank|68
 bench|59
 fire_station|58
 bar|42
-
 ```
 
 ### Top 10 Restaurant Food
