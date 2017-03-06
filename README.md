@@ -40,7 +40,7 @@ ways_nodes.cv ........... 33.1 MB
 newyork.db .............. 138 MB
 ```
 
-### Tag Nmae
+### Tag Name
 
 ```
 'member': 14703
