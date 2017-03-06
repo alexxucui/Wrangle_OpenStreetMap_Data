@@ -19,7 +19,7 @@ New York City, NY, Unisted States
 
 I am living in New York now. As the largest city in the world, I’m interested to see how does the database look like, and I’d like an opportunity to contribute to its improvement this map.
 
-![New York OpenStree Map]()
+![New York OpenStree Map](Wrangle_OpenStreetMap_Data/images/newyork_openstreetmap.PNG)
 
 Dateset: [XML Data Source](https://mapzen.com/data/metro-extracts/metro/new-york_new-york/)
 
