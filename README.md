@@ -25,7 +25,7 @@ Dateset: [XML Data Source](https://mapzen.com/data/metro-extracts/metro/new-york
 
 ## Overview of the Data
 
-We first use the `getsample.py` to only extract 1/100 data from the whole data set. The sample dataset is stroed in `newyork_sample.osm` and is about 270 MB.
+We first use the `getsample.py` to only extract 1/10 data from the whole data set. The sample dataset is stroed in `newyork_sample.osm` and is about 270 MB.
 
 ### Data File Size
 
@@ -68,11 +68,11 @@ We first check the "k" value for each tag and see if there are any potential pro
 'problemchars': 2500
 ```
 
-## Unique Users
+### Unique Users
 
 `len(users): 2428`
 
-## Problems encountered in the Map Data
+## Problems Encountered in the Map Data
 
 After runing some code(in the jupyter notebook file) on the `newyork_sample.osm` dataset, I noticed five main problems with the data:
 
@@ -118,7 +118,6 @@ mapping = { "AVENUE": "Avenue",
 New York State postcodes range from 00051 to 14925. So we will exame any postcodes that don't fall in this range.
 
 Here are some problems with the postcode field:
-
 
 - Doesn't give a specific postcode: *08854-5627*
 - Not in the range: *100014, 320*
@@ -266,7 +265,7 @@ The final return value for a "way" element should look something like:
                'value': '366409'}]}
 ```
 
-## Import CSV into database
+## Import CSV into Database
 
 Data schema is defined in `data_wrangling_schema.sql`
 
@@ -410,6 +409,25 @@ asian|4
 - Phone numbers formatting (xxx-xxx-xxxx)
 - Validate postcode based on street address
 
+###Benefits
+
+- After auditing the phone numbers in a standard format, we can investigate this variable in a more meaningful way. For example, we can study the relation of location of that phone number vs. current location.
+- Check the cross-validation between postcode and street address to make data more "robust".
+
+###Potential issues
+- There can be many different phone formats
+There very little consistency in how phone numbers are formatted as shown below: 
+```
+9175768675  
++9175768675 
+0019175768675 
+917 576 8675 
+917-576-8675 
+```
+- Deal with international phone number formats
+  Different countries have different formats. But I think this portion should be probabaly very small and maybe we can manually fix it.
+- How to validate the postcode with the address?
+  The postcode includes an certain area of street addresses and it might be difficult to implement the validation.
 
 ## Conlcusion
 
