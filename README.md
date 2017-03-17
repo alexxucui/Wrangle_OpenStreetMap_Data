@@ -409,12 +409,12 @@ asian|4
 - Phone numbers formatting (xxx-xxx-xxxx)
 - Validate postcode based on street address
 
-###Benefits
+### Benefits
 
 - After auditing the phone numbers in a standard format, we can investigate this variable in a more meaningful way. For example, we can study the relation of location of that phone number vs. current location.
 - Check the cross-validation between postcode and street address to make data more "robust".
 
-###Potential issues
+### Potential issues
 - There can be many different phone formats
 There very little consistency in how phone numbers are formatted as shown below: 
 ```
